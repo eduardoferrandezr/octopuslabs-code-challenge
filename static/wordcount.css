@@ -101,24 +101,18 @@ a code {
 }
 
 
-.compose .title,
-.compose .submit {
+.form .field,
+.form .submit {
   font-family: "Helvetica Nue", Helvetica, Arial, sans-serif;
   font-weight: bold;
 }
 
-.compose .title {
+.form .field {
   font-size: 20pt;
 }
 
-.compose .title,
-.compose .body_source {
+.form .field {
   width: 100%;
-}
-
-.compose .body_source {
-  height: 500px;
-  line-height: 16pt;
 }
 
 .size10 {

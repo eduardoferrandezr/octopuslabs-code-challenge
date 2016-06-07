@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <form action="{{ request.path }}" method="get" class="compose">
-    <div style="margin-bottom:5px"><input name="url" type="text" class="title" value="{{ url if url else "" }}"/></div>
+  <a href="/admin">Admin Page</a>
+  <form action="{{ request.path }}" method="get" class="form">
+    <div style="margin-bottom:5px"><input name="url" type="text" class="field" value="{{ url if url else "" }}"/></div>
     <div>
       <input type="submit" value="{{ _('Count Words!') }}" class="submit"/>
     </div>

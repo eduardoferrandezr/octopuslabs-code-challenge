@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block body %}
+<a href="/">Main Page</a>
+<table>
+  <thead>
+    <th>Word</th>
+    <th>Count</th>
+  </thead>
+  <tbody>
+  {% for wordcount in counts %}
+    <tr>
+      <td>{{wordcount.word}}</td>
+      <td>{{wordcount.count}}</td>
+    </tr>
+  {% end %}
+  </tbody>
+</table>
+
+{% end %}
+

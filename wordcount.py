@@ -4,24 +4,19 @@ import tornado.escape
 import tornado.web
 import tornado.wsgi
 from bs4 import BeautifulSoup
+import hashlib
 import urllib
 import re
 import operator
 import math
 from stopwords import stopwords
-
 from google.appengine.ext import db
 
 
-class Entry(db.Model):
-    """A single blog entry."""
-    author = db.UserProperty()
-    title = db.StringProperty(required=True)
-    slug = db.StringProperty(required=True)
-    body_source = db.TextProperty(required=True)
-    html = db.TextProperty(required=True)
-    published = db.DateTimeProperty(auto_now_add=True)
-    updated = db.DateTimeProperty(auto_now=True)
+class WordCount(db.Model):
+    id = db.StringProperty(required=True)
+    word = db.StringProperty(required=True)
+    count = db.IntegerProperty(required=True)
 
 
 def remove_html_tags(text):
@@ -40,7 +35,6 @@ def remove_html_tags(text):
     # remove html tags
     text = " ".join(visible_texts)
     return re.sub(r'<[^>]+>',' ',text)
-
 
 
 def extract_words(text):
@@ -72,6 +66,7 @@ def url_wordcount(url):
     wordcount100 = top100words(worddict)
     return wordcount100
 
+
 def build_wordcloud(wordcount):
     wordcloud = dict()
     max_count = wordcount[-1][1]
@@ -81,25 +76,53 @@ def build_wordcloud(wordcount):
     return wordcloud
 
 
+def add_to_database(wordcount):
+    for word, count in wordcount:
+        m = hashlib.sha1()
+        m.update(settings.get("salt"))
+        m.update(word)
+        id = m.hexdigest()
+        obj = db.Query(WordCount).filter("id =", id).get()
+        if obj is None:
+            obj = WordCount(
+                id=id,
+                word=word,
+                count=count
+            )
+        else:
+            obj.count += count
+        obj.put()
+
+
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
         url = self.get_argument("url", None)
         if url is not None:
             wordcount = url_wordcount(url)
+            add_to_database(wordcount)
             wordcloud = build_wordcloud(wordcount)
         else:
             wordcloud = {}
         self.render("main.html", url=url, wordcloud=wordcloud)
+
+class AdminHandler(tornado.web.RequestHandler):
+    def get(self):
+        counts = db.Query(WordCount).order('-count')
+        self.render("admin.html", counts=counts)
 
 
 settings = {
     "page_title": u"Word Count",
     "template_path": os.path.join(os.path.dirname(__file__), "templates"),
     "xsrf_cookies": True,
+    "salt": 'this is the salt',
+    "rsakeyfile": 'rsakey'
 }
 application = tornado.web.Application([
     (r"/", HomeHandler),
+    (r"/admin", AdminHandler)
 ], **settings)
 
 application = tornado.wsgi.WSGIAdapter(application)
+
