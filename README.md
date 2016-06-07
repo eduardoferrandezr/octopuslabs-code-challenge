@@ -6,7 +6,7 @@ Google App Engine SDK installed in your computer
 
 ## Install
 
-https://github.com/eduardoferrandezr/octopuslabs-code-challenge.git
+git clone https://github.com/eduardoferrandezr/octopuslabs-code-challenge.git
 
 cd octopuslabs-code-challenge
 
