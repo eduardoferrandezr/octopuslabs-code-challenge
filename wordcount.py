@@ -3,11 +3,13 @@ import os.path
 import tornado.escape
 import tornado.web
 import tornado.wsgi
+from bs4 import BeautifulSoup
 import urllib
 import re
 import operator
 import math
 from stopwords import stopwords
+
 from google.appengine.ext import db
 
 
@@ -23,7 +25,22 @@ class Entry(db.Model):
 
 
 def remove_html_tags(text):
+    # remove not visible content
+    soup = BeautifulSoup(text, 'html.parser')
+    texts = soup.findAll(text=True)
+
+    def visible(element):
+        if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
+            return False
+        elif re.match('<!--.*-->', unicode(element)):
+            return False
+        return True
+    visible_texts = filter(visible, texts)
+
+    # remove html tags
+    text = " ".join(visible_texts)
     return re.sub(r'<[^>]+>',' ',text)
+
 
 
 def extract_words(text):
