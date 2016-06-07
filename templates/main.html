@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <form action="{{ request.path }}" method="get" class="compose">
+    <div style="margin-bottom:5px"><input name="url" type="text" class="title" value="{{ url if url else "" }}"/></div>
+    <div>
+      <input type="submit" value="{{ _('Count Words!') }}" class="submit"/>
+    </div>
+    {% module xsrf_form_html() %}
+  </form>
+  {% for (word, size) in wordcloud.items() %}
+    <span class="size{{size}}">{{word}}</span>
+  {% end %}
+{% end %}
+
