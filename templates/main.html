@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <a href="/admin">Admin Page</a>
+  <p><a href="/admin">Go to Admin Page</a></p>
   <form action="{{ request.path }}" method="get" class="form">
+    {% if error %}
+    <div style="color:red">{{error}}</div>
+    {% end %}
     <div style="margin-bottom:5px"><input name="url" type="text" class="field" value="{{ url if url else "" }}"/></div>
     <div>
       <input type="submit" value="{{ _('Count Words!') }}" class="submit"/>
